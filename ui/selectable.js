@@ -56,10 +56,11 @@ return $.widget("ui.selectable", $.ui.mouse, {
 			selectees.addClass("ui-selectee");
 			selectees.each(function() {
 				var $this = $(this),
+					w = $(window),
 					context = $(that.options.appendTo),
 					pos = $this.offset();
-				pos.top += context.scrollTop();
-				pos.left += context.scrollLeft();
+				pos.left += context.scrollLeft() - w.scrollLeft();
+				pos.top += context.scrollTop() - w.scrollTop();
 				$.data(this, "selectable-item", {
 					element: this,
 					$element: $this,
@@ -95,11 +96,12 @@ return $.widget("ui.selectable", $.ui.mouse, {
 	_mouseStart: function(event) {
 		var that = this,
 			options = this.options,
+			w = $(window),
 			context = $(options.appendTo),
-			scrollLeft = context.scrollLeft(),
-			scrollTop = context.scrollTop();
+			x = event.pageX + context.scrollLeft() - w.scrollLeft(),
+			y = event.pageY + context.scrollTop() - w.scrollTop();
 
-		this.opos = [ scrollLeft + event.pageX, scrollTop + event.pageY ];
+		this.opos = [ x, y ];
 
 		if (this.options.disabled) {
 			return;
@@ -112,8 +114,8 @@ return $.widget("ui.selectable", $.ui.mouse, {
 		$(options.appendTo).append(this.helper);
 		// position helper (lasso)
 		this.helper.css({
-			"left": scrollLeft + event.pageX,
-			"top": scrollTop + event.pageY,
+			"left": x,
+			"top": y,
 			"width": 0,
 			"height": 0
 		});
@@ -175,11 +177,12 @@ return $.widget("ui.selectable", $.ui.mouse, {
 		var tmp,
 			that = this,
 			options = this.options,
+			w = $(window),
 			context = $(options.appendTo),
 			x1 = this.opos[0],
 			y1 = this.opos[1],
-			x2 = event.pageX + context.scrollLeft(),
-			y2 = event.pageY + context.scrollTop();
+			x2 = event.pageX + context.scrollLeft() - w.scrollLeft(),
+			y2 = event.pageY + context.scrollTop() - w.scrollTop();
 
 		if (x1 > x2) { tmp = x2; x2 = x1; x1 = tmp; }
 		if (y1 > y2) { tmp = y2; y2 = y1; y1 = tmp; }
